@@ -1,6 +1,6 @@
 {
   "name": "wss-hooks",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "",
   "main": "index.js",
   "homepage": "https://github.com/MuratovBektur/wss-hooks",
@@ -11,9 +11,16 @@
   "engines" : {
     "node" : ">=14.0.0"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
+  "keywords": [
+    "ws",
+    "hook",
+    "hooks",
+    "websocket",
+    "websocket server",
+    "websocket server hooks"
+  ],
   "dependencies": {
     "ws": "^8.5.0"
   },
