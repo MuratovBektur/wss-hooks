@@ -55,6 +55,6 @@ import { hook } from 'wss-hooks'
 
 hook('echo', ({ data, ws, wss }) => {
    console.log('wss', wss.clients.size);
-   ws.post(data) // if array comes from client as: '[ "echo" , {"name":"John","skills": ["html", "css"]}]' , then it will return to the client: '{"name":"John","skills": ["html", "css"]}'
+   ws.post('custom-event', data) // if array comes from client as: '[ "echo" , {"name":"John","skills": ["html", "css"]}]' , then it will return to the client: '[ "custom-event" , {"name":"John","skills": ["html", "css"]}]'
 })
 ```
