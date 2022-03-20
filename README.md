@@ -49,7 +49,7 @@ async function start () {
 start()
 
 ```
-### /hooks/echo folder
+### hooks/echo
 ```typescript
 import { hook } from 'wss-hooks'
 
