@@ -24,10 +24,18 @@ const normalizeData = (data: BinaryData): Array <any> | false => {
 
   return Array.isArray(o) && o.length > 0 && o
 }
+const isEmpty = (data: any):boolean => data === null || data === undefined
 
 function wss (options: WebSocketServerOptions, cb: WebSocketServerCb) {
   const socketServer = new WebSocketServer(options, cb)
   socketServer.on("connection", function connection(ws: any) {
+    ws.post = function (event: string, data: any) {
+      let preparedData = [event]
+      if (!isEmpty(data)) {
+        preparedData.push(data)
+      }
+      return ws.send(JSON.stringify(preparedData))
+    }
     ws.on("message", function message(data: any) {
       data = normalizeData(data)
       if (data && typeof data[0] === 'string') {
@@ -46,14 +54,12 @@ function hook (event: string, cb: (data: any) => any) {
   emitter.on(event, cb)
 }
 
-function pathToHooks (dirname: 'string', nameFolder: 'string') {
-  let normalizedFolder = path.join(dirname, nameFolder)
-
-  fs
-    .readdirSync(normalizedFolder)
-    .forEach(function (file: string) {
-      require(normalizedFolder + '/' + file)
-    })
+async function pathToHooks (dirname: 'string', nameFolder: 'string') {
+  const normalizedFolder = path.join(dirname, nameFolder)
+  const files = await fs.readdirSync(normalizedFolder)
+  await Promise.all(files.map(async (file: string) => {
+      await import(normalizedFolder + '/' + file);
+  }))
 }
 
 module.exports = {

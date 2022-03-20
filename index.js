@@ -18,9 +18,17 @@ const normalizeData = (data) => {
     let o = getJSON(result);
     return Array.isArray(o) && o.length > 0 && o;
 };
+const isEmpty = (data) => data === null || data === undefined;
 function wss(options, cb) {
     const socketServer = new WebSocketServer(options, cb);
     socketServer.on("connection", function connection(ws) {
+        ws.post = function (event, data) {
+            let preparedData = [event];
+            if (!isEmpty(data)) {
+                preparedData.push(data);
+            }
+            return ws.send(JSON.stringify(preparedData));
+        };
         ws.on("message", function message(data) {
             data = normalizeData(data);
             if (data && typeof data[0] === 'string') {
@@ -37,13 +45,12 @@ function wss(options, cb) {
 function hook(event, cb) {
     emitter.on(event, cb);
 }
-function pathToHooks(dirname, nameFolder) {
-    let normalizedFolder = path.join(dirname, nameFolder);
-    fs
-        .readdirSync(normalizedFolder)
-        .forEach(function (file) {
-        require(normalizedFolder + '/' + file);
-    });
+async function pathToHooks(dirname, nameFolder) {
+    const normalizedFolder = path.join(dirname, nameFolder);
+    const files = await fs.readdirSync(normalizedFolder);
+    await Promise.all(files.map(async (file) => {
+        await import(normalizedFolder + '/' + file);
+    }));
 }
 module.exports = {
     wss,
