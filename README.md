@@ -38,8 +38,8 @@ async function start () {
   try {
     const WSS = wss(options) // options for the WebSocketServer object from 'ws' package
     await pathToHooks(__dirname, 'hooks') // path to hooks folder
-    WSS.on('connection', (ws) => { 
-      // your code
+    WSS.on('connection', (ws) => { // if you want you can use additional code here
+      // your optional code
     })
   } catch (err) {
     console.error(err)
@@ -56,5 +56,35 @@ import { hook } from 'wss-hooks'
 hook('echo', ({ data, ws, wss }) => {
    console.log('wss', wss.clients.size);
    ws.post('custom-event', data) // if array comes from client as: '[ "echo" , {"name":"John","skills": ["html", "css"]}]',  
-                                 // then it will return to the client: '[ "custom-event" , {"name":"John","skills": ["html", "css"]}]'})
+}                                // then it will return to the client: '[ "custom-event" , {"name":"John","skills": ["html", "css"]}]'})
+```
+### with Express
+```typescript
+import { wss, pathToHooks } from "wss-hooks";
+import express  from "express";
+import { createServer } from "http";
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const PORT = +process.env.PORT || 5000
+
+const app = express()
+
+async function start () {
+  try {
+    app.get('/', (req, res) => res.send('Hello world'))
+  
+    const server = createServer();
+    const WSS = wss({ server });
+    server.on("request", app);
+    
+    await pathToHooks(__dirname, 'hooks') // path to hooks folder
+    server.listen(PORT, () => console.log("http/ws server listening on", PORT));
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+start()
 ```
